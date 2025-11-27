@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import re
+import sys
 from abc import ABC, abstractmethod
 from typing import Any, List, Optional
 
@@ -805,6 +806,10 @@ def create_bd_client(
         If prefer_daemon is True and daemon is not running, falls back to CLI client.
         To check if daemon is running without falling back, use BdDaemonClient directly.
     """
+    # Skip daemon on Windows - Unix sockets are not supported
+    if sys.platform == "win32" and prefer_daemon:
+        prefer_daemon = False
+
     if prefer_daemon:
         try:
             from .bd_daemon_client import BdDaemonClient
